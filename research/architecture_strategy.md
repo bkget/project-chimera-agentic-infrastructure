@@ -1,35 +1,83 @@
 # Project Chimera: Architectural Strategy & Governance
 
-## 1. Executive Summary
-Project Chimera is an Autonomous Influencer Network architected for massive scale using **Spec-Driven Development (SDD)**. The system relies on a Hierarchical Swarm pattern, Java 21+ Virtual Threads, and the Model Context Protocol (MCP) to ensure modular, secure, and performant agentic operations.
+## 1. Executive Research Summary
+### 1.1 The AI Software Stack (a16z Analysis)
+Our architecture follows the shift from "Coprocessors" to **"Autonomous Agents."** By utilizing Java 21, we treat the LLM as a modular reasoning engine within a robust, system-centric "Factory."
 
-## 2. Core Architectural Pattern: The "FastRender" Swarm
-We utilize a decentralized swarm topology where specialized agents coordinate via a non-blocking asynchronous message bus.
+### 1.2 OpenClaw & MoltBook Integration
+Project Chimera acts as a "Talent Agency" within the **OpenClaw** ecosystem. Our agents maintain cryptographically verifiable identities, allowing them to broadcast their availability and services to other agents on **MoltBook**.
 
+---
 
+## 2. Agent Social Network & Protocols
+### 2.1 How Chimera fits into OpenClaw
+* **Identity:** Chimera agents use OpenClaw credentials to manage non-custodial wallets via **Coinbase AgentKit**.
+* **Discovery:** We use MCP `Resources` to allow brand-agents to discover our influencers' current status and engagement metrics.
 
-### Agent Roles:
-- **Planner (The Strategist):** Responsible for decomposing high-level business objectives into atomic tasks. Uses LLM-driven planning to define the "Path to Goal."
-- **Worker (The Executioner):** Executes atomic tasks (e.g., content generation, trend analysis). This node is stateless and ephemeral.
-- **Judge (The Governor):** Performs real-time validation of Worker output against defined constraints (e.g., brand voice, factual accuracy, safety protocols) before escalation.
+### 2.2 Social Protocols (Agent-to-Agent)
+* **Capability Discovery:** Standardized MCP tool-calling.
+* **Task Delegation:** Planner-to-Worker JSON message passing using **Java Records**.
+* **Status Broadcasting:** Event-driven pulses to the OpenClaw network.
 
-## 3. Technology Stack & Concurrency Model
-- **Runtime:** Java 21 (LTS) for **Virtual Threads**. 
-    - *Rationale:* Thousands of concurrent agent sub-processes require a non-blocking I/O model to prevent thread starvation.
-- **Data Modeling:** Strict usage of **Java Records** for all DTOs and inter-agent communication.
-    - *Rationale:* Ensures **Immutability**, crucial for thread-safe state management in highly concurrent environments.
-- **Connectivity:** Model Context Protocol (MCP) serves as the standard interface for external integrations (Social Media APIs, Database Connectors, Blockchain).
-- **Commerce:** Integration with **Coinbase AgentKit** for non-custodial wallet management and autonomous economic actions.
+---
 
-## 4. Governance & CI/CD Pipeline
-- **Spec Fidelity:** No implementation code shall be merged without a ratified Spec (API schemas, Database ERDs).
-- **Testing Strategy:** True TDD (Test-Driven Development). Failing tests are the definition of "Done."
-- **Governance Policy:** - All builds must pass linting and static analysis.
-    - Automatic semantic versioning of Agent Skills.
-    - Immutable event logging for auditability of agent decisions.
+## 3. Architectural Approach
 
-## 5. Implementation Roadmap
-1. **Phase 1:** Environment Scaffolding (Java 21, Maven Multi-module).
-2. **Phase 2:** Define Contract Interfaces (Planner-Worker-Judge API).
-3. **Phase 3:** Implement core MCP Servers.
-4. **Phase 4:** Agentic Commerce Integration.
+### 3.1 Agent Pattern: Hierarchical FastRender Swarm
+We have selected the **Hierarchical Swarm** pattern over a Sequential Chain.
+- **Planner (The Brain):** Decomposes goals into atomic tasks.
+- **Worker Pool (The Executioner):** Stateless, ephemeral, and scaled via **Java 21 Virtual Threads**.
+- **Judge (The Governor):** A mandatory validation layer that mitigates hallucinations.
+- **Rationale:** Sequential chains create single points of failure. Swarms allow for parallel execution and specialized validation, crucial for high-velocity content generation.
+
+### 3.2 Human-in-the-Loop (HITL) & Safety Layer
+The human acts as a "Strategic Governor" based on the Judge's confidence score:
+- **Score > 0.90:** Auto-approve and publish.
+- **Score 0.70–0.90:** Async human approval via the Orchestrator Dashboard.
+- **Score < 0.70:** Auto-reject and re-queue for the Planner.
+- **Hard Constraint:** All financial transactions or sensitive brand-voice topics are routed to HITL regardless of score.
+
+### 3.3 Database Choice: The Hybrid Approach
+To handle high-velocity video metadata and agent memories, we use a specialized stack:
+- **PostgreSQL (SQL):** Structured data (User accounts, campaign configurations, operational logs). Needed for ACID compliance.
+- **Weaviate (Vector/NoSQL):** High-velocity video metadata, embeddings, and "Agent Memory." Essential for semantic search and trend matching.
+- **Redis:** Volatile task queues for the FastRender swarm (Planner -> Worker -> Judge).
+
+---
+
+## 4. System Architecture Diagram (Mermaid)
+
+```mermaid
+graph TD
+    User((Operator)) --> Dashboard[Orchestrator Dashboard]
+    Dashboard --> Planner[Planner Service]
+    Planner --> RedisQ[(TaskQueue: Redis)]
+    
+    subgraph WorkerSwarm [Worker Pool - Java 21 Virtual Threads]
+        W1[Worker 1]
+        W2[Worker 2]
+        WN[Worker N]
+    end
+    
+    RedisQ --> WorkerSwarm
+    WorkerSwarm --> ReviewQ[(ReviewQueue: Redis)]
+    
+    ReviewQ --> Judge[Judge Service]
+    Judge --> PG[(GlobalState: PostgreSQL)]
+    Judge --> Weaviate[(Metadata & Memory: Weaviate)]
+    
+    Judge -- Score < 0.9 --> HITL[HITL Dashboard]
+    Judge -- Score > 0.9 --> Action[Action System]
+    
+    Action --> MCP[MCP Servers]
+    Action --> AgentKit[Coinbase AgentKit]
+    
+    MCP --> Social[Twitter / OpenClaw / MoltBook]
+```
+
+---
+## 5. Technology Stack & Concurrency
+- **Runtime**: Java 21 (LTS) using Executors.newVirtualThreadPerTaskExecutor().
+- **Data Modeling**: Immutable Java Records for all DTOs (Data Transfer Objects) to ensure thread-safe state management.
+- **Governance**: All development is logged via the Tenx MCP Analysis server for real-time architectural feedback.
+
