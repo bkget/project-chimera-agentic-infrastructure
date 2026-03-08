@@ -1,82 +1,207 @@
-# OpenClaw Integration Specifications
+# OpenClaw Integration Protocol Specification
 
 ## Overview
+Project Chimera agents participate in the OpenClaw decentralized network using Decentralized Identifiers (DID) for secure, verifiable identity management. This specification defines the protocols for agent registration, status broadcasting, and skill discovery within the MoltBook ecosystem.
 
-Project Chimera integrates with the OpenClaw protocol to enable decentralized agent interactions within the broader AI ecosystem. Our agents participate as autonomous entities with verifiable identities, allowing them to form a social network for collaborative content generation and task delegation.
+## 1. Identity Protocol (DID-Based)
 
-## Agent Registration
+### Agent Registration
+Each Chimera agent registers with the OpenClaw network using a DID document:
 
-### 1. Agent ID Registration
-
-Each Chimera agent registers a unique 'Agent ID' on the OpenClaw network to establish its identity and enable discovery by other agents.
-
-**Process:**
-- Generate a cryptographically secure Agent ID using OpenClaw's identity management system
-- Associate the ID with the agent's non-custodial wallet via Coinbase AgentKit
-- Register the ID with metadata including agent type (Planner/Worker/Judge), capabilities, and contact endpoints
-- Maintain the registration through periodic renewals to stay active on the network
-
-**Technical Implementation:**
-- Use MCP Resources API to publish agent metadata
-- Store registration credentials securely using Java 21's security features
-- Ensure Agent ID immutability for the agent's lifecycle
-
-## Status Broadcasting
-
-### 2. Heartbeat Status Publication
-
-Agents continuously publish their operational status to the network, enabling real-time monitoring and load balancing.
-
-**Status Types:**
-- **Idle**: Agent is available for task assignment
-- **Active**: Agent is currently executing tasks
-- **Error**: Agent has encountered an issue and requires attention
-
-**Publication Mechanism:**
-- Send heartbeat messages every 30 seconds via MCP protocol
-- Include current workload metrics and resource utilization
-- Use event-driven pulses to minimize network overhead
-- Route error statuses to human operators for intervention
-
-## Capability Broadcasting
-
-### 3. Capability Resource Broadcasting
-
-Agents advertise their specialized capabilities to allow other agents and systems to discover and hire them for content generation tasks.
-
-**Capability Categories:**
-- **Content Generation**: Video script writing, trend analysis, brand voice adaptation
-- **Data Processing**: Real-time engagement data fetching, metadata analysis
-- **Validation**: Content quality assessment, brand compliance checking
-- **Coordination**: Task planning, swarm orchestration
-
-**Broadcasting Process:**
-- Publish capability manifests using MCP Resources
-- Include pricing models, performance metrics, and specialization areas
-- Update capabilities dynamically based on agent learning and upgrades
-- Enable peer-to-peer hiring through OpenClaw's marketplace features
-
-**Example Capability Resource:**
 ```json
 {
-  "agentId": "chimera-worker-001",
-  "capabilities": [
+  "@context": "https://www.w3.org/ns/did/v1",
+  "id": "did:openclaw:chimera-agent-001",
+  "verificationMethod": [
     {
-      "type": "content_generation",
-      "specialization": "viral_video_scripts",
-      "pricing": "per_task",
-      "performance_score": 0.95
+      "id": "did:openclaw:chimera-agent-001#keys-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:openclaw:chimera-agent-001",
+      "publicKeyMultibase": "z6Mk..."
     }
   ],
-  "status": "idle",
-  "last_updated": "2026-03-08T12:00:00Z"
+  "service": [
+    {
+      "id": "did:openclaw:chimera-agent-001#mcp",
+      "type": "MCPResourceEndpoint",
+      "serviceEndpoint": "https://api.chimera.ai/mcp/agent-001"
+    }
+  ]
 }
 ```
 
-## Integration Benefits
+### Content Signing with DIDs
+Agents use their DID keys to cryptographically sign all generated content, ensuring authenticity and non-repudiation:
 
-- **Decentralized Discovery**: Agents can find and collaborate without centralized coordination
-- **Trust through Cryptography**: Verifiable identities ensure secure interactions
-- **Scalable Networking**: MCP-based communication allows seamless integration with other AI systems
-- **Economic Incentives**: Capability broadcasting enables agent-to-agent transactions and revenue generation</content>
+```json
+{
+  "content": "Viral video script content...",
+  "metadata": {
+    "author": "did:openclaw:chimera-agent-001",
+    "timestamp": "2026-03-08T12:00:00Z",
+    "correlationId": "req-12345"
+  },
+  "signature": {
+    "type": "Ed25519Signature2020",
+    "created": "2026-03-08T12:00:00Z",
+    "verificationMethod": "did:openclaw:chimera-agent-001#keys-1",
+    "proofValue": "z2tb...signature..."
+  }
+}
+```
+
+This allows content consumers to verify the agent's identity and content integrity.
+
+## 2. Status Broadcasting (Pulse API)
+
+### Pulse Message Schema
+Agents broadcast their operational status via regular pulse messages:
+
+```json
+{
+  "$schema": "https://openclaw.org/schemas/pulse/v1",
+  "agentId": "did:openclaw:chimera-agent-001",
+  "timestamp": "2026-03-08T12:00:00Z",
+  "status": "Available",
+  "workload": {
+    "activeTasks": 2,
+    "queueDepth": 5,
+    "cpuUsage": 0.65
+  },
+  "signature": "eyJhbGciOiJFZDI1NTE5..."
+}
+```
+
+### Status Types
+- **Available**: Agent is ready to accept new tasks
+- **Busy**: Agent is currently processing tasks
+
+### Broadcasting Mechanism
+- Messages are published to the OpenClaw pub/sub network
+- Other agents subscribe to pulse topics for load balancing
+- Status changes trigger immediate broadcasts
+
+## 3. Skill Discovery (MCP Resource Protocol)
+
+### Skills Manifest
+Agents expose their capabilities through MCP Resources:
+
+```json
+{
+  "@context": "https://openclaw.org/mcp/v1",
+  "resourceId": "skills://chimera-agent-001/capabilities",
+  "name": "Chimera Agent Skills",
+  "description": "Available capabilities for content generation and analysis",
+  "skills": [
+    {
+      "id": "trend-analyzer",
+      "name": "Social Media Trend Analyzer",
+      "description": "Analyzes viral trends across platforms",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {"type": "string"},
+          "platforms": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "trendScore": {"type": "number"},
+          "engagementMetrics": {"type": "object"}
+        }
+      },
+      "pricing": {
+        "currency": "USD",
+        "perRequest": 0.10
+      }
+    },
+    {
+      "id": "content-generator",
+      "name": "AI Content Generator",
+      "description": "Generates viral content based on trends",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {"type": "string"},
+          "style": {"type": "string"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "content": {"type": "string"},
+          "hashtags": {"type": "array"}
+        }
+      },
+      "pricing": {
+        "currency": "USD",
+        "perRequest": 0.25
+        }
+    }
+  ],
+  "lastUpdated": "2026-03-08T12:00:00Z"
+}
+```
+
+### Discovery Process
+1. **Query**: Other agents query the MCP resource endpoint
+2. **Filtering**: Agents filter skills by capability, pricing, and availability
+3. **Negotiation**: Direct agent-to-agent communication for task assignment
+4. **Execution**: Tasks are executed with real-time status updates
+
+### Security Considerations
+- All MCP communications are encrypted
+- Skill manifests include capability attestations
+- Pricing and availability are cryptographically signed
+- Disputes are resolved through the OpenClaw arbitration network
+
+## 4. Negotiation Protocol
+
+### Task Request via MCP Tool Call
+Sponsor Agents initiate collaboration by sending TaskRequest messages through MCP tool calls to Chimera Planner Agents:
+
+**MCP Tool Call Example:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "chimera_planner_request",
+    "arguments": {
+      "taskRequest": {
+        "taskId": "task-456",
+        "description": "Generate viral content for brand X",
+        "priority": 8,
+        "inputData": {
+          "brand": "TechCorp",
+          "topic": "AI innovation",
+          "targetAudience": "developers"
+        },
+        "deadline": "2026-03-08T18:00:00Z",
+        "correlationId": "sponsor-req-789"
+      },
+      "sponsorAgentId": "did:openclaw:sponsor-agent-002",
+      "compensation": {
+        "amount": 50,
+        "currency": "USD",
+        "paymentMethod": "crypto"
+      }
+    }
+  }
+}
+```
+
+### Negotiation Flow
+1. **Discovery**: Sponsor agent queries Chimera planner's MCP endpoint
+2. **Proposal**: Sponsor sends TaskRequest with compensation details
+3. **Acceptance**: Chimera planner validates request and confirms availability
+4. **Execution**: Task is delegated to worker swarm with real-time progress updates
+5. **Completion**: Results delivered with cryptographic proof of work
+
+### Trust Mechanisms
+- All negotiations include cryptographic signatures
+- Compensation is held in escrow until task completion
+- Performance metrics are recorded on-chain for reputation tracking
+
+This protocol enables seamless agent collaboration within the decentralized influencer factory ecosystem.</content>
 <parameter name="filePath">c:\Users\bkget.SEBLI\Documents\GitHub-Personal\10x Challenges\Project Chimera The Agentic Infrastructure\project-chemera--agentic-infrastructure\specs\openclaw_integration.md
