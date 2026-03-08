@@ -1,0 +1,25 @@
+reviews:
+  rules:
+    - name: Spec-Fidelity
+      description: Check if the PR aligns with the contracts defined in /specs/technical.md
+      condition: "true"
+      required: true
+      fail_message: "PR must align with technical specifications in /specs/technical.md"
+
+    - name: Immutability
+      description: Flag any DTO that is not a Java Record
+      condition: "file.path.endsWith('.java') && file.content.contains('class') && !file.content.contains('record')"
+      required: true
+      fail_message: "All DTOs must be Java Records for immutability"
+
+    - name: Concurrency
+      description: Verify that I/O operations utilize Virtual Threads rather than legacy thread pools
+      condition: "file.path.endsWith('.java') && file.content.contains('Executor') && !file.content.contains('newVirtualThreadPerTaskExecutor')"
+      required: true
+      fail_message: "I/O operations must use Virtual Threads (Executors.newVirtualThreadPerTaskExecutor())"
+
+    - name: Testing
+      description: Reject any PR that adds logic without a corresponding JUnit 5 test in the skills or services modules
+      condition: "file.path.endsWith('.java') && !file.path.contains('Test') && (file.path.contains('skills/') || file.path.contains('services/'))"
+      required: true
+      fail_message: "All logic in skills/services modules must have corresponding JUnit 5 tests"
