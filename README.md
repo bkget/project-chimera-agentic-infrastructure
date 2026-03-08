@@ -22,9 +22,15 @@ The system transforms traditional content workflows into autonomous operations, 
 - **Cryptographic Trust**: DID-based identities ensure verifiable agent interactions
 
 ### Swarm Components
-* **Planner Agent**: Decomposes viral marketing goals into executable task graphs
-* **Worker Pool**: Stateless execution agents using MCP tools for content generation and data fetching
-* **Judge Agent**: Validation layer ensuring brand compliance and factual accuracy
+* **Planner Agent**: Decomposes viral marketing goals into executable task graphs using strategic reasoning
+* **Worker Pool**: Stateless execution agents utilizing specialized skills for content generation, data fetching, and financial operations
+* **Judge Agent**: Validation layer ensuring brand compliance, factual accuracy, and quality assurance
+
+### Skills Architecture
+* **Modular Skills Framework**: Extensible skill interfaces in `com.chimera.skills` for agent capabilities
+* **Safety Guardrails**: Built-in budget enforcement with `BudgetExceededException` preventing financial overruns
+* **Wallet Management**: Coinbase AgentKit integration for secure cryptocurrency transactions
+* **Trend Analysis**: AI-powered market intelligence for content optimization
 
 ### Technical Foundation
 - **Java 21 Virtual Threads**: Enables massive concurrency without thread overhead
@@ -37,11 +43,12 @@ The system transforms traditional content workflows into autonomous operations, 
 ## Tech Stack & Ecosystem Integration
 
 ### Core Technologies
-* **Runtime**: Java 21 LTS with Virtual Threads
-* **Build System**: Maven Multi-Module
-* **Concurrency**: Virtual Threads for I/O-bound operations
-* **Data**: Hybrid PostgreSQL + Weaviate architecture
-* **Communication**: Model Context Protocol (MCP)
+* **Runtime**: Java 21 LTS with Virtual Threads for massive concurrency
+* **Build System**: Maven Multi-Module architecture with centralized dependency management
+* **Test Framework**: JUnit 5 with Mockito for comprehensive TDD pipeline
+* **Concurrency**: Virtual Threads enabling thousands of concurrent agent operations
+* **Data**: Hybrid PostgreSQL + Weaviate architecture for operational and semantic data
+* **Communication**: Model Context Protocol (MCP) for standardized agent tool-calling
 
 ### Decentralized Ecosystem
 * **OpenClaw/MoltBook**: Social network for agent discovery and collaboration
@@ -57,15 +64,17 @@ Project Chimera follows **Spec-Driven Development (SDD)** where specifications i
 
 ### Automated Governance Tools
 - **Makefile**: Orchestrates build, test, and validation workflows
-- **TDD Pipeline**: JUnit 5 tests with Mockito for all business logic
-- **CI/CD**: GitHub Actions enforcing quality gates
-- **Spec-Check Script**: Automated validation of architectural compliance
+- **TDD Pipeline**: JUnit 5 tests with Mockito ensuring 100% business logic coverage
+- **CI/CD**: GitHub Actions enforcing quality gates and architectural compliance
+- **Spec-Check Script**: Automated validation of SDD implementation
+- **Skills Framework**: Modular safety guardrails including `BudgetExceededException` for financial oversight
 
 ### Quality Assurance
-- **Code Style**: Google Checkstyle enforcement
-- **Test Coverage**: 100% business logic coverage requirement
-- **Traceability**: `correlationId` tracking across all agent interactions
-- **Immutability**: All DTOs must be Java Records
+- **Code Style**: Google Checkstyle enforcement across all modules
+- **Test Coverage**: Mandatory TDD with failing tests preceding implementation
+- **Traceability**: `correlationId` tracking across Planner → Worker → Judge interactions
+- **Immutability**: All DTOs implemented as Java Records for thread-safety
+- **Financial Safety**: Budget validation preventing autonomous agent overspending
 
 ---
 
@@ -82,7 +91,7 @@ Project Chimera follows **Spec-Driven Development (SDD)** where specifications i
 ├── planner/             # Planning service (com.chimera.planner)
 ├── worker/              # Execution service (com.chimera.worker)
 ├── judge/               # Evaluation service (com.chimera.judge)
-├── skills/              # Reusable skill interfaces (com.chimera.skills)
+├── skills/              # Skill interfaces & implementations (com.chimera.skills)
 ├── Dockerfile           # Containerized testing environment
 ├── Makefile             # Build orchestration
 └── pom.xml              # Parent Maven configuration
@@ -173,7 +182,27 @@ make setup && make lint && make test && make spec-check
 
 ---
 
-## Ecosystem Integration
+## Skills Framework
+
+### Core Skills Architecture
+Project Chimera implements a modular skills framework enabling agents to execute specialized operations:
+
+* **WalletManagerSkill**: Cryptocurrency wallet operations with budget enforcement
+  - Balance checking via Coinbase AgentKit
+  - Transaction signing with `BudgetExceededException` safety guardrails
+  - Prevents autonomous financial overruns
+
+* **TrendAnalyzerSkill**: Market intelligence and content optimization
+  - Real-time trend analysis for influencer content
+  - Data-driven insights for viral content strategies
+
+### Safety & Governance
+* **Exception Handling**: Structured error propagation with domain-specific exceptions
+* **Budget Controls**: Hard-coded financial limits preventing agent overspending
+* **Immutable Contracts**: All skill interactions use Java Records for thread-safety
+* **Test-Driven Safety**: Comprehensive JUnit 5 coverage ensuring guardrail effectiveness
+
+---
 
 ### OpenClaw Protocol
 - **Identity**: DID-based agent registration and content signing
@@ -181,9 +210,10 @@ make setup && make lint && make test && make spec-check
 - **Negotiation**: Tool-call based task delegation between agents
 
 ### Coinbase AgentKit
-- **Wallet Management**: Secure cryptocurrency operations
-- **Transaction Signing**: Budget-controlled financial transactions
-- **Economic Incentives**: Agent-to-agent payment facilitation
+- **Wallet Management**: Secure cryptocurrency operations via WalletManagerSkill
+- **Transaction Signing**: Budget-controlled financial transactions with exception handling
+- **Economic Incentives**: Agent-to-agent payment facilitation with safety guardrails
+- **Budget Enforcement**: `BudgetExceededException` prevents unauthorized spending
 
 ---
 

@@ -48,6 +48,7 @@
         <module>planner</module>
         <module>worker</module>
         <module>judge</module>
+        <module>skills</module>
     </modules>
 
     <build>

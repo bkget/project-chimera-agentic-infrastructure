@@ -11,18 +11,13 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>worker</artifactId>
+    <artifactId>skills</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.chimera</groupId>
-            <artifactId>skills</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- JUnit 5 for testing -->
         <dependency>
