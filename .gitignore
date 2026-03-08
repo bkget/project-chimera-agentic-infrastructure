@@ -1,29 +1,129 @@
-# Compiled class file
+# ----------------------------
+
+# Java / Maven
+
+# ----------------------------
+
+# Compiled files
+
 *.class
 
-# Log file
-*.log
+# Maven build directory
 
-# BlueJ files
-*.ctxt
+**/target/
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Maven wrapper (keep jar, ignore logs)
 
-.vscode/
-.cursor/
-.github/
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+.mvn/wrapper/maven-wrapper.jar
 
-# Package Files #
+# Package artifacts
+
 *.jar
 *.war
-*.nar
 *.ear
+*.nar
+
+# Dependency archives
+
 *.zip
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Logs
+
+*.log
+
+# JVM crash logs
+
 hs_err_pid*
 replay_pid*
 
+# ----------------------------
+
+# IDE
+
+# ----------------------------
+
+# VS Code
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# IntelliJ (if someone opens project there)
+
+.idea/
+*.iml
+
+# Eclipse
+
+.project
+.classpath
+.settings/
+
+# ----------------------------
+
+# OS Files
+
+# ----------------------------
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----------------------------
+
+# AI / MCP / Cursor
+
+# ----------------------------
+
+.cursor/
+.github/
+.mcp/
+.cache/
+
+# ----------------------------
+
+# Environment / Secrets
+
+# ----------------------------
+
+.env
+.env.*
+*.key
+*.pem
+*.crt
+secrets/
+
+# ----------------------------
+
+# Temporary
+
+# ----------------------------
+
+tmp/
+temp/
+*.tmp
+
+# ----------------------------
+
+# Node (sometimes used by MCP tooling)
+
+# ----------------------------
+
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ----------------------------
+
+# Python (if tooling scripts exist)
+
+# ----------------------------
+
+**pycache**/
+*.pyc
+.venv/
+venv/
