@@ -1,0 +1,27 @@
+{
+  "class": "AgentMemory",
+  "description": "Semantic memory storage for agent experiences and learning, enabling Worker agents to search past trends",
+  "properties": [
+    {
+      "name": "content",
+      "dataType": ["text"],
+      "description": "Text content of the memory or experience"
+    },
+    {
+      "name": "agent_type",
+      "dataType": ["string"],
+      "description": "Type of agent that created the memory (Planner, Worker, Judge)"
+    },
+    {
+      "name": "timestamp",
+      "dataType": ["date"],
+      "description": "When the memory was recorded"
+    },
+    {
+      "name": "vectorWeights",
+      "dataType": ["number[]"],
+      "description": "Vector weights/embeddings for semantic search and similarity matching"
+    }
+  ],
+  "vectorizer": "text2vec-transformers"
+}

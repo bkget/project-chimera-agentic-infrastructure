@@ -1,6 +1,6 @@
 # Project Chimera Master Control
 
-.PHONY: setup test lint clean docker-test spec-check
+.PHONY: setup test lint clean docker-test spec-check db-check
 
 # Setup: Initialize the environment by building all modules without running tests
 setup:
@@ -27,5 +27,9 @@ docker-test:
 spec-check:
 	python3 scripts/spec_check.py
 
+# DB check: Verify schema.sql contains mandatory correlation_id column
+db-check:
+	@grep -q "correlation_id" src/main/resources/db/schema.sql && echo "✓ correlation_id found in agent_logs table" || (echo "✗ correlation_id missing from schema.sql" && exit 1)
+
 # The Master Switch for CI/CD
-all: setup lint test spec-check
+all: setup lint test spec-check db-check
