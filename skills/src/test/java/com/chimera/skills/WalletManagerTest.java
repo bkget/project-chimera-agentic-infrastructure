@@ -1,5 +1,6 @@
 package com.chimera.skills;
 
+import com.chimera.skills.contracts.BalanceInfo;
 import com.chimera.skills.contracts.TransactionRequest;
 import com.chimera.skills.exceptions.BudgetExceededException;
 import org.junit.jupiter.api.Test;
@@ -13,22 +14,22 @@ public class WalletManagerTest {
 
     @Test
     public void shouldThrowExceptionWhenBudgetExceeded() {
-        // Given: A mock implementation of WalletManagerSkill
-        WalletManagerSkill walletManager = Mockito.mock(WalletManagerSkill.class);
+        // USE THE REAL IMPLEMENTATION, NOT A MOCK
+        WalletManagerSkill walletManager = new WalletManagerSkill() {
+            @Override
+            public BalanceInfo checkBalance(String address) { return null; }
+        };
 
-        // Mock the behavior to throw BudgetExceededException for amounts over 500 USD
         TransactionRequest highAmountRequest = new TransactionRequest(
             "recipientAddress",
-            BigDecimal.valueOf(600), // Amount exceeding 500 USD safety limit
+            new BigDecimal("150000"), // 150k is over the 100k limit in the code
             "USD",
-            "Test transaction exceeding budget"
+            "Test transaction"
         );
-        Mockito.when(walletManager.signTransaction(highAmountRequest))
-               .thenThrow(new BudgetExceededException("Transaction amount 600 USD exceeds safety limit of 500 USD"));
 
-        // When & Then: Signing the transaction should throw BudgetExceededException
+        // This will FAIL if you comment out the check in the actual class
         assertThrows(BudgetExceededException.class, () -> {
             walletManager.signTransaction(highAmountRequest);
-        }, "Should throw BudgetExceededException for amounts over 500 USD");
+        });
     }
 }
